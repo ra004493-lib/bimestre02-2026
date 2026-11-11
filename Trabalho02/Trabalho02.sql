@@ -1,0 +1,59 @@
+---A função calcular_preco_impressao foi criada para automatizar o cálculo do valor de uma impressão 3D com base no tempo estimado de produção.
+
+CREATE OR REPLACE FUNCTION calcular_preco_impressao(
+    p_horas NUMERIC
+)
+RETURNS NUMERIC AS
+$$
+BEGIN
+    RETURN p_horas * 8.50;
+END;
+$$ LANGUAGE plpgsql;
+
+---O que faz: Calcula automaticamente o valor da impressão considerando R$ 8,50 por hora de uso da impressora.
+SELECT calcular_preco_impressao(5);
+
+---A função verificar_status_pedido permite consultar rapidamente a situação atual de um pedido.
+
+CREATE OR REPLACE FUNCTION verificar_status_pedido(
+    p_pedido_id INT
+)
+RETURNS TEXT AS
+$$
+DECLARE
+    v_status TEXT;
+BEGIN
+    SELECT status_pedido
+    INTO v_status
+    FROM pedido
+    WHERE pedido_id = p_pedido_id;
+
+    RETURN COALESCE(v_status, 'Pedido não encontrado');
+END;
+$$ LANGUAGE plpgsql;
+
+--O que faz: Mostra se o pedido está "Em produção", "Finalizado", "Entregue" ou "Cancelado".
+SELECT verificar_status_pedido(1);
+
+
+---A função total_impressoes_cliente gera um relatório resumido mostrando quantas impressões cada cliente já solicitou ao sistema.
+
+CREATE OR REPLACE FUNCTION total_impressoes_cliente(
+    p_cliente_id INT
+)
+RETURNS INTEGER AS
+$$
+DECLARE
+    v_total INTEGER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_total
+    FROM pedido
+    WHERE cliente_id = p_cliente_id;
+
+    RETURN v_total;
+END;
+$$ LANGUAGE plpgsql;
+
+---O que faz: Mostra quantas impressões um cliente já solicitou.
+SELECT total_impressoes_cliente(3);
